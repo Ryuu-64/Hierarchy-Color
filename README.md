@@ -19,9 +19,9 @@ click add button
 
 ## Customize
 
-Check the ScriptableObject HierarchyIconInfo at path:
+Check the ScriptableObject HierarchyColorInfo at path:
 
-Assets\Plugins\Ryuu\Hierarchy Icon\HierarchyIconInfo.asset
+Assets\Plugins\Ryuu\Hierarchy Color\HierarchyColorInfo.asset
 
 ## Contact
 
