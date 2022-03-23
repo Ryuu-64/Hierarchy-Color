@@ -88,6 +88,15 @@ namespace Ryuu.HierarchyColor.Editor
 
         private static void HierarchyColorOnGUI(int instanceID, Rect selectionRect)
         {
+            if (Info == null)
+            {
+                Debug.LogWarning(
+                    $"There is no {nameof(HierarchyColorInfo)}. Go to Tools -> Hierarchy Color. Set the {nameof(HierarchyColorInfo)}.\n" +
+                    $"You can create info file by click {nameof(CreateInfo)} button in {nameof(HierarchyColorInfo)}."
+                );
+                return;
+            }
+
             // type check
             if (EditorUtility.InstanceIDToObject(instanceID) is not GameObject gameObject)
             {
