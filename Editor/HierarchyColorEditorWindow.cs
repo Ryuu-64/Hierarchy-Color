@@ -1,6 +1,6 @@
 using UnityEditor;
 using UnityEngine;
-using static Ryuu.HierarchyColor.Editor.HierarchyColorCore;
+using static Ryuu.HierarchyColor.Editor.HierarchyColorController;
 
 namespace Ryuu.HierarchyColor.Editor
 {
@@ -16,43 +16,47 @@ namespace Ryuu.HierarchyColor.Editor
 
         private void OnGUI()
         {
-            if (!Info)
+            if (!Model)
             {
-                BtnCreateInfo();
+                ButtonCreateModel();
+                EditorGUILayout.Space();
+                NoModelHelpBox();
             }
-            else if (Info)
+            else
             {
-                ObjFldInfo();
-                EditorGUILayout.Space(2);
-                BtnEnableDisable();
+                ObjectFieldModel();
+                EditorGUILayout.Space();
+                ButtonEnableDisable();
             }
 
-            static void BtnCreateInfo()
+            static void ButtonCreateModel()
             {
-                if (GUILayout.Button(nameof(CreateInfo)))
-                {
-                    CreateInfo();
-                    SetInfo();
-                }
+                if (!GUILayout.Button(nameof(CreateModel))) return;
 
+                CreateModel();
+                SetModel();
+            }
+
+            static void NoModelHelpBox()
+            {
                 EditorGUILayout.HelpBox(
-                    $"There is no {nameof(HierarchyColorInfo)}.\n" +
-                    $" You can create an info file by clicking {nameof(CreateInfo)} button.",
+                    $"There is no {nameof(HierarchyColorModel)}.\n" +
+                    $" You can create an info file by clicking {nameof(ButtonCreateModel)}.",
                     MessageType.Warning
                 );
             }
 
-            static void ObjFldInfo()
+            static void ObjectFieldModel()
             {
-                Info = (HierarchyColorInfo) EditorGUILayout.ObjectField(
-                    $"{nameof(HierarchyColorInfo)}",
-                    Info,
-                    typeof(HierarchyColorInfo),
+                Model = (HierarchyColorModel) EditorGUILayout.ObjectField(
+                    $"{nameof(HierarchyColorModel)}",
+                    Model,
+                    typeof(HierarchyColorModel),
                     false
                 );
             }
 
-            static void BtnEnableDisable()
+            static void ButtonEnableDisable()
             {
                 if (GUILayout.Button("Enable / Disable")) EnableOrDisable();
             }

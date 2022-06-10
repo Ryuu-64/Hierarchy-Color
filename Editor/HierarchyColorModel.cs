@@ -4,38 +4,37 @@ using UnityEngine;
 
 namespace Ryuu.HierarchyColor.Editor
 {
-    [Serializable]
-    internal class Style
+    internal class HierarchyColorModel : ScriptableObject
     {
-        public string prefix;
-        public Color textColor;
-        public Color backgroundColor;
-        public TextAnchor textAnchor;
-        public FontStyle fontStyle;
 
-        public Style(string prefix, Color textColor, Color backgroundColor, TextAnchor textAnchor,
-            FontStyle fontStyle)
+        [Serializable]
+        internal class Style
         {
-            this.prefix = prefix;
-            this.textColor = textColor;
-            this.backgroundColor = backgroundColor;
-            this.textAnchor = textAnchor;
-            this.fontStyle = fontStyle;
-        }
-    }
+            public string prefix;
+            public Color textColor;
+            public Color backgroundColor;
+            public TextAnchor textAnchor;
+            public FontStyle fontStyle;
 
-    internal class HierarchyColorInfo : ScriptableObject
-    {
+            public Style(string prefix, Color textColor, Color backgroundColor, TextAnchor textAnchor,
+                FontStyle fontStyle)
+            {
+                this.prefix = prefix;
+                this.textColor = textColor;
+                this.backgroundColor = backgroundColor;
+                this.textAnchor = textAnchor;
+                this.fontStyle = fontStyle;
+            }
+        }
+
         public bool enableWhenOpenEditor;
-        public bool enableUpperCase;
         public int hierarchyPaddingX;
         public int hierarchyOffsetX;
         public List<Style> styles;
 
-        public HierarchyColorInfo()
+        public HierarchyColorModel()
         {
             enableWhenOpenEditor = true;
-            enableUpperCase = true;
             hierarchyPaddingX = 20;
             hierarchyOffsetX = -28;
             Color orangeRed = new(1, 69 / 255f, 0, 1);
@@ -72,7 +71,7 @@ namespace Ryuu.HierarchyColor.Editor
 
         private void OnValidate()
         {
-            foreach (var style in styles)
+            foreach (Style style in styles)
             {
                 style.backgroundColor.a = 1;
             }

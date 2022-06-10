@@ -10,53 +10,53 @@ using UnityEngine;
 
 namespace Ryuu.HierarchyColor.Editor
 {
-    internal static class HierarchyColorCore
+    internal static class HierarchyColorController
     {
-        public static HierarchyColorInfo Info;
+        public static HierarchyColorModel Model;
 
         [InitializeOnLoadMethod]
         public static void ColorfulHierarchyInitialize()
         {
-            // get hierarchy styles
-            string[] guids = AssetDatabase.FindAssets($"t:{nameof(HierarchyColorInfo)}");
+            string[] guids = AssetDatabase.FindAssets($"t:{nameof(HierarchyColorModel)}");
 
-            // create hierarchy styles if no exist
-            if (guids is not {Length: > 0})
+            if (guids == null || guids.Length == 0)
             {
-                CreateInfo();
+                CreateModel();
             }
 
-            SetInfo();
+            SetModel();
         }
 
-        public static void CreateInfo()
+        public static void CreateModel()
         {
-            var info = ScriptableObject.CreateInstance<HierarchyColorInfo>();
+            const string modelPath = "Assets/Plugins/Ryuu/Hierarchy Color/";
 
-            if (!Directory.Exists("Assets/Plugins/Ryuu/Hierarchy Color/"))
+            var info = ScriptableObject.CreateInstance<HierarchyColorModel>();
+
+            if (!Directory.Exists(modelPath))
             {
-                Directory.CreateDirectory("Assets/Plugins/Ryuu/Hierarchy Color/");
+                Directory.CreateDirectory(modelPath);
             }
 
-            AssetDatabase.CreateAsset(info,
-                $"Assets/Plugins/Ryuu/Hierarchy Color/{nameof(HierarchyColorInfo)}.asset");
+            AssetDatabase.CreateAsset(info, $"{modelPath}{nameof(HierarchyColorModel)}.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log(
-                $"{nameof(HierarchyColorInfo)} created.\n Check {HierarchyColorEditorWindow.MENU_ITEM_PATH}."
+                $"{nameof(HierarchyColorModel)} created at {modelPath}.\n" +
+                $" Check {HierarchyColorEditorWindow.MENU_ITEM_PATH}."
             );
         }
 
-        public static void SetInfo()
+        public static void SetModel()
         {
-            if (Info == null)
+            if (Model == null)
             {
-                string[] guids = AssetDatabase.FindAssets($"t:{nameof(HierarchyColorInfo)}");
+                string[] guids = AssetDatabase.FindAssets($"t:{nameof(HierarchyColorModel)}");
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                Info = AssetDatabase.LoadAssetAtPath<HierarchyColorInfo>(path);
+                Model = AssetDatabase.LoadAssetAtPath<HierarchyColorModel>(path);
             }
 
-            if (Info.enableWhenOpenEditor)
+            if (Model.enableWhenOpenEditor)
             {
                 Enable();
             }
@@ -64,8 +64,12 @@ namespace Ryuu.HierarchyColor.Editor
 
         public static void EnableOrDisable()
         {
-            if (EditorApplication.hierarchyWindowItemOnGUI.GetInvocationList().Any(@delegate =>
-                    @delegate.Method.Name.Equals(nameof(HierarchyColorOnGUI))))
+            if (EditorApplication.hierarchyWindowItemOnGUI
+                .GetInvocationList()
+                .Any(
+                    @delegate => @delegate.Method.Name.Equals(nameof(HierarchyColorOnGUI))
+                )
+               )
             {
                 Disable();
             }
@@ -77,7 +81,6 @@ namespace Ryuu.HierarchyColor.Editor
 
         private static void Enable()
         {
-            EditorApplication.hierarchyWindowItemOnGUI -= HierarchyColorOnGUI;
             EditorApplication.hierarchyWindowItemOnGUI += HierarchyColorOnGUI;
         }
 
@@ -88,11 +91,12 @@ namespace Ryuu.HierarchyColor.Editor
 
         private static void HierarchyColorOnGUI(int instanceID, Rect selectionRect)
         {
-            if (Info == null)
+            if (Model == null)
             {
                 Debug.LogWarning(
-                    $"There is no {nameof(HierarchyColorInfo)}. Go to Tools -> Hierarchy Color. Set the {nameof(HierarchyColorInfo)}.\n" +
-                    $"You can create info file by click {nameof(CreateInfo)} button in {nameof(HierarchyColorInfo)}."
+                    $"There is no {nameof(HierarchyColorModel)}. Go to Tools -> Hierarchy Color.\n" +
+                    $" Set the {nameof(HierarchyColorModel)}.\n" +
+                    $"You can create info file by click {nameof(CreateModel)} button in {nameof(HierarchyColorModel)}."
                 );
                 return;
             }
@@ -104,16 +108,11 @@ namespace Ryuu.HierarchyColor.Editor
             }
 
             // target style check
-            var hierarchyStyle = Info.styles.SingleOrDefault(style => gameObject.name.StartsWith(style.prefix));
+            HierarchyColorModel.Style hierarchyStyle = Model.styles.SingleOrDefault(style => gameObject.name.StartsWith(style.prefix));
             if (hierarchyStyle == null)
             {
                 return;
             }
-
-            // upper
-            string text = Info.enableUpperCase
-                ? gameObject.name[hierarchyStyle.prefix.Length..].ToUpper()
-                : gameObject.name[hierarchyStyle.prefix.Length..];
 
             // set data
             var guiStyle = new GUIStyle
@@ -125,14 +124,15 @@ namespace Ryuu.HierarchyColor.Editor
             var backgroundRect = new Rect(selectionRect);
             if (gameObject.transform.childCount == 0 && gameObject.transform.parent == null)
             {
-                backgroundRect.x += Info.hierarchyOffsetX;
-                backgroundRect.width -= Info.hierarchyOffsetX;
+                backgroundRect.x += Model.hierarchyOffsetX;
+                backgroundRect.width -= Model.hierarchyOffsetX;
             }
 
-            backgroundRect.width += Info.hierarchyPaddingX;
+            backgroundRect.width += Model.hierarchyPaddingX;
 
             // draw
             EditorGUI.DrawRect(backgroundRect, hierarchyStyle.backgroundColor);
+            string text = gameObject.name[hierarchyStyle.prefix.Length..];
             EditorGUI.LabelField(selectionRect, text, guiStyle);
         }
     }

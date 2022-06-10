@@ -1,5 +1,5 @@
 {
-    "name": "HierarchyColorAssembly",
+    "name": "HierarchyColor",
     "rootNamespace": "Ryuu.HierarchyColor",
     "references": [],
     "includePlatforms": [
